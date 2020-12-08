@@ -3,35 +3,37 @@
 #	Copyright 1993, 1998, 2014
 #                 Toyoda Masashi
 #		  (mtoyoda@acm.org)
-#	Last Modified: 2014/03/31
+#	Last Modified: 2020/12/08
 #==========================================
 
 CC=gcc
 
 ifeq ($(OS),Windows_NT)
-	CFLAGS=-O -Wall -I./PDCurses -L.
-	RM = cmd /c del
-	SL = sl.exe
-	CURSES = -l:pdcurses.a
+	LIBDIR=PDCurses/wincon
+	CFLAGS=-O -Wall -IPDCurses -L$(LIBDIR)
+	RM=cmd /c del
+	SL=sl.exe
+	CURSES=-l:pdcurses.a
+	LIBCURSES=$(LIBDIR)/pdcurses.a
 else
 	CFLAGS=-O -Wall
-	RM = rm -f
-	SL = sl
-	CURSES = -lncurses
+	RM=rm -f
+	SL=sl
+	CURSES=-lncurses
 endif
 
-all: pdcurses.a $(SL)
+all: $(LIBCURSES) $(SL)
 
 $(SL): sl.c sl.h
 	$(CC) $(CFLAGS) -o $(SL) sl.c $(CURSES)
 
-pdcurses.a:
-	$(MAKE) -C ./PDCurses/wincon
-	cp ./PDCurses/wincon/pdcurses.a .
+$(LIBCURSES):
+	$(MAKE) -C $(LIBDIR)
 
 clean:
 	$(RM) $(SL)
-	$(MAKE) -C ./PDCurses/wincon clean
-	$(RM) pdcurses.a
+ifeq ($(OS),Windows_NT)
+	$(MAKE) -C $(LIBDIR) clean
+endif
 
 distclean: clean
