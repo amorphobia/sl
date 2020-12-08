@@ -7,14 +7,31 @@
 #==========================================
 
 CC=gcc
-CFLAGS=-O -Wall
 
-all: sl
+ifeq ($(OS),Windows_NT)
+	CFLAGS=-O -Wall -I./PDCurses -L.
+	RM = cmd /c del
+	SL = sl.exe
+	CURSES = -l:pdcurses.a
+else
+	CFLAGS=-O -Wall
+	RM = rm -f
+	SL = sl
+	CURSES = -lncurses
+endif
 
-sl: sl.c sl.h
-	$(CC) $(CFLAGS) -o sl sl.c -lncurses
+all: pdcurses.a $(SL)
+
+$(SL): sl.c sl.h
+	$(CC) $(CFLAGS) -o $(SL) sl.c $(CURSES)
+
+pdcurses.a:
+	$(MAKE) -C ./PDCurses/wincon
+	cp ./PDCurses/wincon/pdcurses.a .
 
 clean:
-	rm -f sl
+	$(RM) $(SL)
+	$(MAKE) -C ./PDCurses/wincon clean
+	$(RM) pdcurses.a
 
 distclean: clean
