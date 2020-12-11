@@ -1,3 +1,5 @@
 /sl
 /sl.exe
-pdcurses.a
+.xmake/
+build/
+.DS_Store

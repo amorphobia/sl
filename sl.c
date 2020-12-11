@@ -3,7 +3,7 @@
  *        Copyright 1993,1998,2014-2015
  *                  Toyoda Masashi
  *                  (mtoyoda@acm.org)
- *        Last Modified: 2014/06/03
+ *        Last Modified: 2020/12/11
  *========================================
  */
 /* sl version 5.03 : Fix some more compiler warnings.                        */
@@ -40,7 +40,11 @@
 
 #include <curses.h>
 #include <signal.h>
+#ifndef _WIN32
 #include <unistd.h>
+#else
+#include <windows.h>
+#endif
 #include "sl.h"
 
 void add_smoke(int y, int x);
@@ -109,7 +113,11 @@ int main(int argc, char *argv[])
         }
         getch();
         refresh();
+#ifndef _WIN32
         usleep(40000);
+#else
+        Sleep(40);
+#endif
     }
     mvcur(0, COLS - 1, LINES - 1, 0);
     endwin();
